@@ -16,7 +16,7 @@ async function createDatabase() {
             host: process.env.DB_HOST || 'localhost',
             port: Number(process.env.DB_PORT || 3306),
             user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASS || ''
+            password: process.env.DB_PASS || 'root'
         });
 
         await connection.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
@@ -33,7 +33,7 @@ export const AppDataSource = new DataSource({
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT || 3306),
     username: process.env.DB_USER || 'root',
-    password: process.env.DB_PASS || '',
+    password: process.env.DB_PASS || 'root',
     database: dbName,
     entities: [Employee, Department, Project],
     synchronize: true,
