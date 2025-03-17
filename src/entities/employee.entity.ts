@@ -5,10 +5,13 @@ import {
     CreateDateColumn, 
     ManyToMany,
     ManyToOne,
-    JoinTable
+    OneToOne,
+    JoinTable,
+    JoinColumn
 } from 'typeorm';
 import { Department } from './department.entity';
 import { Project } from './project.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Employee {
@@ -20,7 +23,6 @@ export class Employee {
 
     @Column()
     position: string;
-
 
     @Column({ nullable: true }) 
     jobTitle: string;
@@ -40,4 +42,7 @@ export class Employee {
     @ManyToMany(() => Project, project => project.employees)
     @JoinTable()
     projects: Project[];
+
+    @OneToOne(() => User, user => user.employee)
+    user: User;
 }

@@ -4,10 +4,12 @@ import { Employee } from '../entities/employee.entity';
 import { Department } from '../entities/department.entity';
 import { Like } from 'typeorm';
 import { Project } from '../entities/project.entity'; 
+import { profileEnd } from 'console';
 
 export class EmployeeService {
     private employeeRepository: Repository<Employee>;
     private departmentRepository: Repository<Department>;
+    private projectRepository: Repository<Project>;
 
     constructor() {
         this.employeeRepository = AppDataSource.getRepository(Employee);
@@ -43,35 +45,38 @@ export class EmployeeService {
             throw error;
         }
     }
+
     async updateSalary(id: number, salary: number) {
-        // Find the employee
-        const employee = await this.employeeRepository.findOne({
-            where: { id },
-            relations: ['department']
-        });
+        try {
+            const employee = await this.employeeRepository.findOne({
+                where: { id },
+                relations: ['department']
+            });
 
-        if (!employee) {
-            throw new Error('Employee not found');
-        }
-
-        // Update salary
-        employee.salary = salary;
-        
-        // Save changes
-        await this.employeeRepository.save(employee);
-
-        // Return formatted response
-        return {
-            id: employee.id,
-            name: employee.name,
-            position: employee.position,
-            salary: employee.salary,
-            department: {
-                id: employee.department?.id,
-                name: employee.department?.name
+            if (!employee) {
+                throw new Error('Employee not found');
             }
-        };
+
+            employee.salary = salary;
+            const updatedEmployee = await this.employeeRepository.save(employee);
+
+            return {
+                id: updatedEmployee.id,
+                name: updatedEmployee.name,
+                position: updatedEmployee.position,
+                department: {
+                    id: updatedEmployee.department.id,
+                    name: updatedEmployee.department.name
+                },
+                hireDate: updatedEmployee.hireDate,
+                salary: updatedEmployee.salary
+            };
+        } catch (error) {
+            console.error('Error in updateSalary service:', error);
+            throw error;
+        }
     }
+
 
     async softDelete(id: number) {
         // Find the employee
@@ -124,15 +129,16 @@ export class EmployeeService {
     }
 
 
-    async create(employeeData: {
+   async create(employeeData: {
         name: string;
         position: string;
         departmentId: number;
         hireDate: string;
+        salary: number;
     }) {
         try {
             const department = await this.departmentRepository.findOne({
-                where: { id: parseInt(employeeData.departmentId.toString()) }
+                where: { id: employeeData.departmentId }
             });
 
             if (!department) {
@@ -144,6 +150,7 @@ export class EmployeeService {
                 position: employeeData.position,
                 department: department,
                 hireDate: new Date(employeeData.hireDate),
+                salary: employeeData.salary,
                 isActive: true
             });
 
@@ -157,7 +164,8 @@ export class EmployeeService {
                     id: department.id,
                     name: department.name
                 },
-                hireDate: savedEmployee.hireDate
+                hireDate: savedEmployee.hireDate,
+                salary: savedEmployee.salary
             };
         } catch (error) {
             console.error('Error in create service:', error);
@@ -166,38 +174,67 @@ export class EmployeeService {
     }
 
 
+    async getById(id: number){
+        try{
+            const employee = await this.employeeRepository.findOne({
+                where: {id},
+                relations: ['department', 'projects']
+            });
+            if(!employee){
+                throw new Error('Employee not found');
+            }
+            return {
+                id: employee.id,
+                name: employee.name,
+                position: employee.position,
+                department :{
+                  id:employee.department?.id,
+                  name: employee.department?.name
+                },
+                hireDate:employee.hireDate,
+                salary:employee.salary,
+                projects: employee.projects.map(project => ({
+                    id: project.id,
+                    name: project.name
+
+                }))
+            };
+        }
+            catch(error){
+                console.error('Error fetching employee:', error);
+                throw error;
+            }
+    }
+
+
     async searchByName(name: string) {
         try {
-            console.log('Searching for employees with name:', name);
-            
             const employees = await this.employeeRepository.find({
-                where: {
-                    name: Like(`%${name}%`),  // Case-sensitive search
-                    isActive: true  // Only search active employees
-                },
-                relations: ['department'],
-                order: {
-                    name: 'ASC'  // Sort results alphabetically
-                }
+                where: { name: Like(`%${name}%`) },
+                relations: ['department', 'projects']
             });
-    
-            console.log(`Found ${employees.length} employees`);
-    
-            // Format response to match the example
+
             return employees.map(employee => ({
                 id: employee.id,
                 name: employee.name,
                 position: employee.position,
                 department: {
-                    id: employee.department?.id,
-                    name: employee.department?.name
-                }
+                    id: employee.department.id,
+                    name: employee.department.name
+                },
+                hireDate: employee.hireDate,
+                salary: employee.salary,
+                projects: employee.projects.map(project => ({
+                    id: project.id,
+                    name: project.name
+                }))
             }));
         } catch (error) {
-            console.error('Error searching employees:', error);
+            console.error('Error in searchByName service:', error);
             throw error;
         }
     }
+
 
     async assignToProject(employeeId: number, projectId: number) {
         try {

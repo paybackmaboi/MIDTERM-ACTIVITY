@@ -13,4 +13,17 @@ export class DepartmentService {
         const department = this.departmentRepository.create(departmentData);
         return this.departmentRepository.save(department);
     }
+
+
+    async getAll() {
+        return this.departmentRepository.find();
+    }
+
+    async getById(id: number) {
+        return this.departmentRepository.findOne({
+            where: { id },
+            relations: ['employees']
+        });
+    }
+
 }
