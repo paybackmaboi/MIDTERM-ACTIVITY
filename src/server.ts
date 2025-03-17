@@ -5,8 +5,9 @@ import express from 'express';
 import cors from 'cors';
 import { initializeDatabase } from './database/db';
 import employeeRouter from './controllers/employee.controller';
-import { CronService } from './services/cron.service';
 import departmentRouter from './controllers/department.controller';
+import userRouter from './controllers/user.controller'; // Import user router
+import { CronService } from './services/cron.service';
 
 const app = express();
 
@@ -14,7 +15,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-
 
 // Error handling middleware
 const errorHandler = (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -32,8 +32,8 @@ app.get('/health', (req, res) => {
 
 // API routes - make sure this matches your Postman request URL
 app.use('/api/employees', employeeRouter);
-app.use('/api/departments', departmentRouter); // 
-
+app.use('/api/departments', departmentRouter);
+app.use('/api/users', userRouter); // Add user routes
 
 // Error handling middleware should be last
 app.use(errorHandler);

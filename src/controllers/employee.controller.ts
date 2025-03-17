@@ -8,7 +8,7 @@ employeeService.assignToProject(1, 2) // Assign Employee ID 1 to Project ID 2
     .then(result => console.log('Assignment successful:', result))
     .catch(error => console.error('Error:', error.message));
     
-// Create new employee
+//get all employees
 router.get('/', async (req, res, next) => {
     try {
         const page = parseInt(req.query.page as string) || 1;
@@ -22,11 +22,42 @@ router.get('/', async (req, res, next) => {
         next(err);
     }
 });
+
+
+// get single employee by id
+router.get('/:id', async (req, res, next) => {
+    try {
+        const employeeId = parseInt(req.params.id);
+        const employee = await employeeService.getById(employeeId);
+
+        if (!employee) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Employee not found'
+            });
+        }
+
+        res.json({
+            status: 'success',
+            data: employee
+        });
+    } catch (error) {
+        console.error('Error fetching employee by ID:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Error fetching employee by ID'
+        });
+    }
+});
+
+
+
+// Create new employee
 router.post('/', async (req, res, next) => {
     try {
-        const { name, position, departmentId, hireDate } = req.body;
+        const { name, position, departmentId, hireDate, salary } = req.body;
 
-        if (!name || !position || !departmentId || !hireDate) {
+        if (!name || !position || !departmentId || !hireDate || salary === undefined) {
             return res.status(400).json({
                 status: 'error',
                 message: 'Missing required fields'
@@ -37,7 +68,8 @@ router.post('/', async (req, res, next) => {
             name,
             position,
             departmentId,
-            hireDate
+            hireDate,
+            salary
         });
 
         res.status(201).json({
@@ -52,7 +84,7 @@ router.post('/', async (req, res, next) => {
                 message: 'Department not found'
             });
         }
-        
+
         console.error('Error creating employee:', error);
         res.status(500).json({
             status: 'error',
@@ -61,34 +93,40 @@ router.post('/', async (req, res, next) => {
     }
 });
 
+
+// Update employee salary
 router.put('/:id/salary', async (req, res, next) => {
     try {
         const employeeId = parseInt(req.params.id);
         const { salary } = req.body;
 
-        // Validate salary
-        if (salary === undefined || salary < 0) {
+        if (salary === undefined) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Invalid salary value'
+                message: 'Salary is required'
             });
         }
 
         const updatedEmployee = await employeeService.updateSalary(employeeId, salary);
-        
-        res.json({
-            status: 'success',
-            message: 'Salary updated successfully',
-            data: updatedEmployee
-        });
-    } catch (err) {
-        if (err.message === 'Employee not found') {
+
+        if (!updatedEmployee) {
             return res.status(404).json({
                 status: 'error',
                 message: 'Employee not found'
             });
         }
-        next(err);
+
+        res.json({
+            status: 'success',
+            message: 'Employee salary updated successfully',
+            data: updatedEmployee
+        });
+    } catch (error) {
+        console.error('Error updating employee salary:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Error updating employee salary'
+        });
     }
 });
 
@@ -114,26 +152,34 @@ router.delete('/:id', async (req, res, next) => {
     }
 });
 
+// Search employee by name
 router.get('/search', async (req, res, next) => {
     try {
-        const name = req.query.name as string;
-        
+        const { name } = req.query;
+
         if (!name) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Name parameter is required'
+                message: 'Name query parameter is required'
             });
         }
 
-        console.log('Searching for name:', name);
-        const employees = await employeeService.searchByName(name);
-        
-        res.json(employees);
-    } catch (err) {
-        console.error('Search error:', err);
-        next(err);
+        const employees = await employeeService.searchByName(name as string);
+
+        res.json({
+            status: 'success',
+            data: employees
+        });
+    } catch (error) {
+        console.error('Error searching employee by name:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Error searching employee by name'
+        });
     }
 });
+
+
 
 router.post('/:id/projects', async (req, res, next) => {
     try {

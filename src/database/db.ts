@@ -5,10 +5,11 @@ import { DataSource } from 'typeorm';
 import { Employee } from '../entities/employee.entity';
 import { Department } from '../entities/department.entity';
 import { Project } from '../entities/project.entity';
+import { User } from '../entities/user.entity';
 
 dotenv.config();
 
-const dbName = process.env.DB_NAME || 'employee_department_db';
+const dbName = process.env.DB_NAME || 'employee';
 
 async function createDatabase() {
     try {
@@ -35,7 +36,7 @@ export const AppDataSource = new DataSource({
     username: process.env.DB_USER || 'root',
     password: process.env.DB_PASS || 'root',
     database: dbName,
-    entities: [Employee, Department, Project],
+    entities: [Employee, Department, Project, User],
     synchronize: true,
     logging: true
 });
