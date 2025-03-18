@@ -4,11 +4,11 @@ import { Employee } from './employee.entity';
 @Entity()
 export class Project {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    name: string;
+    name!: string;
 
     @ManyToMany(() => Employee, (employee) => employee.projects)
-    employees: Employee[];
+    employees!: Employee[];
 }

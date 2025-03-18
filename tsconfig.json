@@ -12,6 +12,6 @@
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "src/users/user.database.ts", "src/entities/user.entity.ts", "src/controllers/user.controller.ts"],
     "exclude": ["node_modules"]
   }

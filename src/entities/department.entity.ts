@@ -8,12 +8,12 @@ import { Employee } from './employee.entity';
 
 @Entity()
 export class Department {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @Column()
-    name: string;
+  @Column()
+  name!: string;
 
-    @OneToMany(() => Employee, (employee) => employee.department)
-    employees: Employee[];
+  @OneToMany(() => Employee, (employee) => employee.department)
+  employees!: Employee[];
 }
