@@ -108,25 +108,25 @@ export class EmployeeService {
         };
     }
 
-    // Update getAllWithPagination to only return active employees
-    async getAllWithPagination(page: number = 1, limit: number = 10) {
-        const [employees, total] = await this.employeeRepository.findAndCount({
-            where: { isActive: true }, // Only get active employees
-            relations: ['department'],
-            skip: (page - 1) * limit,
-            take: limit
-        });
+    // // Update getAllWithPagination to only return active employees
+    // async getAllWithPagination(page: number = 1, limit: number = 10) {
+    //     const [employees, total] = await this.employeeRepository.findAndCount({
+    //         where: { isActive: true }, // Only get active employees
+    //         relations: ['department'],
+    //         skip: (page - 1) * limit,
+    //         take: limit
+    //     });
 
-        return employees.map(employee => ({
-            id: employee.id,
-            name: employee.name,
-            position: employee.position,
-            department: {
-                id: employee.department?.id,
-                name: employee.department?.name
-            }
-        }));
-    }
+    //     return employees.map(employee => ({
+    //         id: employee.id,
+    //         name: employee.name,
+    //         position: employee.position,
+    //         department: {
+    //             id: employee.department?.id,
+    //             name: employee.department?.name
+    //         }
+    //     }));
+    // }
 
 
    async create(employeeData: {
