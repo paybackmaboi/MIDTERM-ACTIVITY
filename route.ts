@@ -91,9 +91,9 @@ export const Routes = [{
 }];
 
 const staticUsers = [
-    { id: 1, name: "Chrystal Mae", email: "john.doe@example.com" },
-    { id: 2, name: "Jane Smith", email: "jane.smith@example.com" },
-    { id: 3, name: "Alice Johnson", email: "alice.johnson@example.com" }
+    { id: 1, name: "steve", email: "john.doe@example.com" },
+    { id: 2, name: "Jane ", email: "jane.smith@example.com" },
+    { id: 3, name: "Alice ", email: "alice.johnson@example.com" }
 ];
 
 // Apply routes to the router
